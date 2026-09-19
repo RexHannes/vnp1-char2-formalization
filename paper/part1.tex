@@ -1,0 +1,323 @@
+\section{Introduction}
+
+Algebraic branching programs (ABPs) interpolate between formulas and general arithmetic
+circuits.  A width-one ABP is simply a directed path, and hence computes a product of
+affine linear forms.  Applying a Boolean hypercube summation to such products gives the
+nondeterministic class \(\VNPone\).  Bringmann, Ikenmeyer and Zuiddam
+\cite{BringmannIkenmeyerZuiddam2018,BringmannIkenmeyerZuiddam2017} proved
+\[
+  \VNPone(\F)=\VNP(\F)
+  \quad\text{when }\charac(\F)\neq 2,
+\]
+and sharpened their construction so that each affine factor uses at most two variables.
+Their argument uses identities containing division by two.  They showed separately that
+\(\VNPone(\F_2)\subsetneq\VNP(\F_2)\), and explicitly left the remaining
+characteristic-two fields open.
+
+This paper supplies the missing characteristic-two construction whenever the field has an
+element other than zero and one.  The exceptional field is therefore exactly \(\F_2\), in
+agreement with the earlier separation.
+
+\subsection{Main finite theorem}
+
+We count the size of a binary arithmetic formula by the number of leaves, addition gates,
+and multiplication gates.  Leaves are variables or field constants.
+
+\begin{theorem}[Support-two characteristic-two compiler]\label{thm:finite-main}
+Let \(\F\) be a field of characteristic two, let
+\(\tau\in\F\setminus\{0,1\}\), and let \(\Phi\) be a binary division-free arithmetic
+formula of size \(s\).  There exist integers \(q,M\ge 0\) and affine linear forms
+\[
+  L_1,\ldots,L_M\in
+  \F[\mathbf{x},b_1,\ldots,b_q]
+\]
+such that each \(L_j\) involves at most two variables and
+\[
+  \Phi(\mathbf{x})
+  =\sum_{\mathbf{b}\in\B^q}\prod_{j=1}^{M}L_j(\mathbf{x},\mathbf{b}).
+\]
+Moreover,
+\[
+  q\le 14s,
+  \qquad
+  M\le 34s.
+\]
+\end{theorem}
+
+The formal artifact proves a stronger syntactic statement for its generated factors: each
+factor contains at most two variable terms in its explicit affine-form term list.  This
+implies the usual semantic support bound appearing in \cref{thm:finite-main}.
+
+\subsection{Class consequences}
+
+Write \(\VNPtwo(\F)\) for polynomial families admitting polynomial-dimensional Boolean
+hypercube sums of polynomially many affine forms, each involving at most two variables.
+Write \(\Ncl(\mathcal C)\) for the nondeterministic closure of a class \(\mathcal C\).
+
+\begin{theorem}[Internal class equality]\label{thm:class-main}
+Let \(\F\) have characteristic two and suppose \(\F\neq\F_2\).  Then
+\[
+   \Ncl(\VPe(\F))=\VNPtwo(\F).
+\]
+The statement covers finite and infinite fields.
+\end{theorem}
+
+A product of affine forms is a width-one ABP: place the factors consecutively on a directed
+path.  Thus the support-two class maps directly into the class denoted
+\(\VNPwplus\) by Bringmann--Ikenmeyer--Zuiddam.  Conversely, constant-width ABPs have
+polynomial-size formulas, and Valiant's characterization gives
+\(\Ncl(\VPe)=\VNP\) \cite{Valiant1980,BringmannIkenmeyerZuiddam2018}.
+
+\begin{corollary}[Complete field classification]\label{cor:classification}
+For every field \(\F\),
+\[
+  \VNPwplus(\F)=\VNP(\F)
+  \quad\Longleftrightarrow\quad |\F|>2.
+\]
+For unrestricted affine labels,
+\[
+  \VNPone(\F)=\VNP(\F)
+  \quad\Longleftrightarrow\quad \F\not\cong\F_2.
+\]
+\end{corollary}
+
+For characteristic different from two, the first equality is the support-two theorem of
+Bringmann--Ikenmeyer--Zuiddam.  For characteristic two and \(\F\neq\F_2\), it follows from
+\cref{thm:class-main}.  Over \(\F_2\), even unrestricted width one is strictly weaker than
+\(\VNP\) by their Proposition~9.1.
+
+\subsection{Proof architecture}
+
+The proof is deliberately modular.
+
+\begin{enumerate}[label=\textbf{Step \arabic*.},leftmargin=2.2cm]
+\item Convert a formula into a ranked, labelled acyclic graph whose path polynomial is the
+formula.  The graph has maximum total degree three and labels involving at most one
+original variable.
+\item Introduce one Boolean selector variable for each edge.  A product of affine flow
+factors and quadratic pair exclusions is the indicator of a selected source--sink path.
+Multiplying by conditional edge-label factors and summing over all selectors recovers the
+ABP path polynomial.
+\item Replace every quadratic factor \(1+xy\) by a one-bit sum of three support-two affine
+factors.
+\item Replace each ternary internal flow factor by a one-bit sum of four support-two affine
+factors.  The new identity carries an explicit cubic error.
+\item Fix the original edge-selector assignment.  At every ternary vertex, two incident
+edges share a head or a tail, so an already-present pair exclusion kills the cubic error
+pointwise on the Boolean cube.  Only after this cancellation do we sum over the original
+selectors.
+\item Count the fresh auxiliaries and factors.  A sharp structural identity shows that the
+number of ordered pair exclusions is four times the number of addition gates.
+\item Flatten an outer \(\VNP\)-type witness cube with the compiler's fresh cube to obtain
+the class-level inclusion.  The reverse inclusion follows because a product of
+polynomially many affine forms has a polynomial-size formula.
+\end{enumerate}
+
+The distinction in Step~5 is not cosmetic.  The polynomial
+\(abc(1+ab)\) is nonzero in \(\F[a,b,c]\); it vanishes only after \(a,b,c\) are specialized
+to Boolean values.  The formal development contains an explicit negative theorem
+preventing this pointwise argument from being silently promoted to a polynomial identity.
+
+\subsection{Scope}
+
+The result is a representation theorem.  The hypercube may have linearly many witness
+bits, and no faster evaluator for the resulting sum is provided.  Consequently, nothing
+here separates \(\VP\) from \(\VNP\), resolves a Boolean complexity-class problem, or
+implies a subexponential algorithm.
+
+The characteristic-two border-width-two problem studied by Dutta et al.
+\cite{DuttaEtAl2024} is adjacent but different.  Their model is deterministic and
+border-approximate; the present construction is exact and nondeterministic.  No
+Frobenius-root extraction or border simulation is claimed here.
+
+\section{Preliminaries}\label{sec:prelim}
+
+\subsection{Polynomials, formulas, and families}
+
+Throughout, \(\F\) is a field.  A \emph{binary arithmetic formula} is a rooted binary tree
+whose internal nodes are labelled by \(+\) or \(\times\), and whose leaves are variables
+or elements of \(\F\).  Its size is the number of nodes.  If \(l,a,u\) denote the numbers
+of leaves, addition gates, and multiplication gates, respectively, then
+\[
+  s=l+a+u.
+\]
+A family \(f=(f_n)_{n\ge 0}\) is a \emph{p-family} if its number of variables and total
+degree are polynomially bounded.  We use standard definitions of \(\VPe\) and \(\VNP\);
+see, for example, \cite{Burgisser2000,MalodPortier2008}.  The class \(\VPe\) consists of
+p-families with polynomially bounded formula size.
+
+\subsection{Algebraic branching programs}
+
+An algebraic branching program is a finite directed acyclic graph \(G=(V,E)\) with a
+source \(s\), a sink \(t\), and an affine label \(\ell_e\) on every edge.  Its value is
+\[
+  \val(G)=\sum_{P:s\leadsto t}\prod_{e\in P}\ell_e.
+\]
+A width-one ABP is a directed path and hence computes a product of affine forms.  We use
+\(\VPone\) for polynomial-size width-one ABPs with unrestricted affine labels, and
+\(\VPone^{\mathrm{w}+}\) for the version in which every edge label involves at most two
+variables.  Following Bringmann--Ikenmeyer--Zuiddam, set
+\[
+  \VNPone=\Ncl(\VPone),
+  \qquad
+  \VNPwplus=\Ncl(\VPone^{\mathrm{w}+}).
+\]
+
+\subsection{Nondeterministic closure}
+
+\begin{definition}[Nondeterministic closure]\label{def:nclosure}
+For a class \(\mathcal C\) of polynomial families, \(\Ncl(\mathcal C)\) consists of all
+families \(f=(f_n)\) for which there exist a family \(g=(g_n)\in\mathcal C\) and
+polynomially bounded functions \(p,q\) such that
+\[
+  f_n(\mathbf{x})
+   =\sum_{\mathbf{b}\in\B^{p(n)}}g_{q(n)}(\mathbf{b},\mathbf{x}).
+\]
+\end{definition}
+
+This is the closure operator introduced as Definition~2.2 in
+\cite{BringmannIkenmeyerZuiddam2018}.  We will use its monotonicity:
+\[
+  \mathcal C\subseteq\mathcal D
+  \quad\Longrightarrow\quad
+  \Ncl(\mathcal C)\subseteq\Ncl(\mathcal D).
+\]
+
+\subsection{Affine-product hypercube representations}
+
+\begin{definition}[Support-two affine-hypercube representation]\label{def:rep}
+Let \(f\in\F[\mathbf{x}]\).  A support-two affine-hypercube representation of \(f\) is an
+identity
+\[
+  f(\mathbf{x})
+  =\sum_{\mathbf{b}\in\B^q}\prod_{j=1}^{M}L_j(\mathbf{x},\mathbf{b}),
+\]
+where every \(L_j\) is affine and \(|\supp(L_j)|\le 2\).  Constants are allowed, and the
+support counts both original and hypercube variables.
+\end{definition}
+
+For families, \(q\) and \(M\) must be polynomially bounded.  The resulting class is denoted
+\(\VNPtwo\).  Since a product of \(M\) affine factors is computed by a width-one path of
+length \(M\), one has the immediate bridge
+\[
+  \VNPtwo\subseteq\VNPwplus.
+\]
+
+\section{Characteristic-two gadgets}\label{sec:gadgets}
+
+Assume throughout this section that \(\charac(\F)=2\).  Fix
+\(\tau\in\F\setminus\{0,1\}\) and put
+\[
+  \kappa=\tau(\tau+1).
+\]
+
+\begin{lemma}[Denominator legality]\label{lem:kappa}
+The element \(\kappa\) is nonzero.
+\end{lemma}
+
+\begin{proof}
+Both \(\tau\) and \(\tau+1\) are nonzero.  Indeed, \(\tau+1=0\) would imply
+\(\tau=-1=1\) in characteristic two.  Since \(\F\) is a field, their product is nonzero.
+\end{proof}
+
+\subsection{A one-bit quadratic gadget}
+
+\begin{lemma}[Quadratic identity]\label{lem:quadratic}
+For arbitrary elements \(x,y\) of any commutative \(\F\)-algebra,
+\[
+\sum_{h\in\B}
+  \kappa^{-1}(\tau+1+h)(x+\tau+h)(\kappa y+\tau+h)
+ =1+xy.
+\]
+Only \(h\) is Boolean; no Boolean relation is imposed on \(x\) or \(y\).
+\end{lemma}
+
+\begin{proof}
+First prove the denominator-free identity.  The left-hand side before multiplication by
+\(\kappa^{-1}\) is
+\[
+ S=(\tau+1)(x+\tau)(\kappa y+\tau)
+   +\tau(x+\tau+1)(\kappa y+\tau+1).
+\]
+The coefficient of \(\kappa y\) is
+\[
+ (\tau+1)(x+\tau)+\tau(x+\tau+1)
+ =x\bigl((\tau+1)+\tau\bigr)
+   +2\tau(\tau+1)=x.
+\]
+The remaining term is
+\[
+ \tau(\tau+1)\bigl((x+\tau)+(x+\tau+1)\bigr)=\kappa.
+\]
+Thus \(S=\kappa xy+\kappa=\kappa(1+xy)\).  Divide by \(\kappa\), using
+\cref{lem:kappa}.
+\end{proof}
+
+The three factors in each summand involve, respectively, only \(h\), the pair \((x,h)\),
+and the pair \((y,h)\), whenever \(x\) and \(y\) are affine expressions supported on one
+variable each.  A distinct fresh \(h\) will be used for every occurrence of the gadget.
+
+\subsection{A ternary gadget with a controlled error}
+
+Define the two-point functional
+\[
+ \Lambda_\tau[p]
+   =(\tau+1)p(\tau)+\tau p(\tau+1).
+\]
+A direct calculation in characteristic two gives
+\[
+ \Lambda_\tau[1]=1,
+ \qquad
+ \Lambda_\tau[T]=0,
+ \qquad
+ \Lambda_\tau[T^2]=\kappa,
+ \qquad
+ \Lambda_\tau[T^3]=\kappa.
+\]
+
+\begin{lemma}[Ternary identity]\label{lem:ternary}
+For arbitrary elements \(a,b,c\) of any commutative \(\F\)-algebra,
+\begin{align*}
+&\sum_{h\in\B}
+ \kappa^{-1}(\tau+1+h)(a+\tau+h)(b+\tau+h)(c+\tau+h)\\
+&\hspace{35mm}=1+a+b+c+\kappa^{-1}abc.
+\end{align*}
+\end{lemma}
+
+\begin{proof}
+Apply \(\Lambda_\tau\) to
+\[
+ p(T)=(a+T)(b+T)(c+T)
+ =abc+(ab+ac+bc)T+(a+b+c)T^2+T^3.
+\]
+The four moments displayed above yield
+\[
+ \Lambda_\tau[p]=abc+\kappa(a+b+c)+\kappa
+ =\kappa(1+a+b+c)+abc.
+\]
+Division by \(\kappa\) proves the claim.
+\end{proof}
+
+The right-hand side contains the genuine cubic error \(\kappa^{-1}abc\).  It must not be
+discarded as a formal polynomial.
+
+\begin{lemma}[Boolean error killer]\label{lem:killer}
+For \(u,v,w\in\B\), viewed inside any characteristic-two field,
+\[
+  uvw(1+uv)=0.
+\]
+\end{lemma}
+
+\begin{proof}
+If \(uv=0\), the product vanishes.  If \(uv=1\), then \(1+uv=1+1=0\).
+\end{proof}
+
+\begin{remark}[Formal versus pointwise cancellation]\label{rem:firewall}
+The polynomial
+\[
+ abc(1+ab)=abc+a^2b^2c
+\]
+is nonzero in \(\F[a,b,c]\).  The cancellation in \cref{lem:killer} is valid only after
+specializing \(a,b,c\) to Boolean values.  This distinction determines the proof order in
+\cref{sec:compiler} and is separately machine-checked in the formal artifact.
+\end{remark}
