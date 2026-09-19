@@ -1,0 +1,32 @@
+/-
+# VNP₁ over characteristic-two fields: aggregator
+
+Append-only formalization layer.  See
+`VNP1_CHAR2_ARISTOTLE_FORMALIZATION_REPORT.md` at the repository root for the verdict,
+the theorem list, and the exact status of every claim.
+-/
+import RequestProject.AlgebraicComplexity.VNP1Char2.BasicBoolean
+import RequestProject.AlgebraicComplexity.VNP1Char2.FourFactorIdentity
+import RequestProject.AlgebraicComplexity.VNP1Char2.AffineForm
+import RequestProject.AlgebraicComplexity.VNP1Char2.OnePlusProductGadget
+import RequestProject.AlgebraicComplexity.VNP1Char2.HypercubeFlattening
+import RequestProject.AlgebraicComplexity.VNP1Char2.Compiler
+import RequestProject.AlgebraicComplexity.VNP1Char2.PathGraph
+import RequestProject.AlgebraicComplexity.VNP1Char2.PathSelector
+import RequestProject.AlgebraicComplexity.VNP1Char2.PathPolynomial
+import RequestProject.AlgebraicComplexity.VNP1Char2.GraphCompiler
+import RequestProject.AlgebraicComplexity.VNP1Char2.CompilerSize
+import RequestProject.AlgebraicComplexity.VNP1Char2.SupportThree
+import RequestProject.AlgebraicComplexity.VNP1Char2.FormulaToDAG
+import RequestProject.AlgebraicComplexity.VNP1Char2.FormulaDegrees
+import RequestProject.AlgebraicComplexity.VNP1Char2.MainCompiler
+import RequestProject.AlgebraicComplexity.VNP1Char2.PathTheorem
+import RequestProject.AlgebraicComplexity.VNP1Char2.FieldCorollary
+import RequestProject.AlgebraicComplexity.VNP1Char2.RegressionTests
+import RequestProject.AlgebraicComplexity.VNP1Char2.OpenOwners
+import RequestProject.AlgebraicComplexity.VNP1Char2.AxiomAudit
+import RequestProject.AlgebraicComplexity.VNP1Char2.PFamily
+import RequestProject.AlgebraicComplexity.VNP1Char2.Nondeterminism
+import RequestProject.AlgebraicComplexity.VNP1Char2.ClassLevel
+import RequestProject.AlgebraicComplexity.VNP1Char2.ClassLevelAudit
+import RequestProject.AlgebraicComplexity.VNP1Char2.ClassLevelOwners
