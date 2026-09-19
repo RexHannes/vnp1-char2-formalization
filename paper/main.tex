@@ -1,0 +1,157 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[a4paper,margin=1.05in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage[nameinlink,capitalise,noabbrev]{cleveref}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
+
+\definecolor{deepblue}{RGB}{29,64,112}
+\definecolor{deepred}{RGB}{137,42,42}
+\definecolor{softgray}{RGB}{245,246,248}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=deepblue,
+  citecolor=deepblue,
+  urlcolor=deepblue,
+  pdftitle={Nondeterministic Width-One Algebraic Branching Programs in Characteristic Two},
+  pdfauthor={Author information to be supplied}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Nondeterministic width-one ABPs in characteristic two}
+\fancyhead[R]{Preprint draft}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{14pt}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{claim}[theorem]{Claim}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{construction}[theorem]{Construction}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\B}{\{0,1\}}
+\newcommand{\Ncl}{\mathsf{N}}
+\newcommand{\VP}{\mathbf{VP}}
+\newcommand{\VNP}{\mathbf{VNP}}
+\newcommand{\VPe}{\mathbf{VP}_{\!\mathrm e}}
+\newcommand{\VNPe}{\mathbf{VNP}_{\!\mathrm e}}
+\newcommand{\VPone}{\mathbf{VP}_{1}}
+\newcommand{\VNPone}{\mathbf{VNP}_{1}}
+\newcommand{\VNPtwo}{\mathbf{VNP}_{1}^{[\le 2]}}
+\newcommand{\VNPwplus}{\mathbf{VNP}_{1}^{\mathrm{w}+}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\val}{\operatorname{val}}
+\newcommand{\indeg}{\operatorname{indeg}}
+\newcommand{\outdeg}{\operatorname{outdeg}}
+\newcommand{\poly}{\operatorname{poly}}
+\newcommand{\charac}{\operatorname{char}}
+\newcommand{\one}{\mathbf{1}}
+\newcommand{\lean}{\textsc{Lean}}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+
+\DeclareMathOperator{\Eval}{Eval}
+\DeclareMathOperator{\Flow}{Flow}
+\DeclareMathOperator{\Sel}{Sel}
+\DeclareMathOperator{\Pairs}{Pairs}
+\DeclareMathOperator{\td}{tdeg}
+
+\lstdefinestyle{leanstyle}{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{softgray},
+  rulecolor=\color{black!15},
+  xleftmargin=0.5em,
+  xrightmargin=0.5em
+}
+\lstset{style=leanstyle}
+
+\title{\bfseries Nondeterministic Width-One Algebraic Branching Programs\\
+       in Characteristic Two}
+\author{Author information to be supplied\\
+\small Preprint draft accompanying a machine-checked \lean\ artifact}
+\date{19 September 2026}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+\fcolorbox{deepred}{softgray}{\parbox{0.91\textwidth}{
+\textbf{Draft status.}
+The mathematical core described below is represented in a \lean\ 4 archive and the
+accompanying artifact report records a successful build and axiom audit.  The public
+literature consequences use the standard identifications of Valiant and
+Bringmann--Ikenmeyer--Zuiddam and are not imported as axioms.  This manuscript has not yet
+undergone external peer review; a final bibliographic novelty audit should precede public
+claims of priority.
+}}
+\end{center}
+
+\begin{abstract}
+Bringmann, Ikenmeyer and Zuiddam proved that nondeterministic width-one algebraic
+branching programs capture \(\VNP\) over fields of characteristic different from two,
+and, more strongly, that every edge label may involve at most two variables.  They also
+proved a strict separation over \(\F_2\), leaving the other fields of characteristic two
+open.  We give a characteristic-two compiler that covers every field
+\(\F\neq\F_2\).
+
+Let \(\Phi\) be a binary division-free arithmetic formula of size \(s\) over a field
+\(\F\) of characteristic two.  If \(\tau\in\F\setminus\{0,1\}\), then \(\Phi\) admits a
+representation
+\[
+  \Phi(\mathbf{x})
+   = \sum_{\mathbf{b}\in\B^q}\prod_{j=1}^{M} L_j(\mathbf{x},\mathbf{b}),
+\]
+where every \(L_j\) is affine and involves at most two variables, with
+\(q\le 14s\) and \(M\le 34s\).  The construction rests on a one-bit, three-factor
+identity for \(1+xy\), a one-bit ternary identity with an explicit cubic error, and a
+path-selector polynomial whose existing pair-exclusion factors kill that error only after
+the selector variables have been fixed to Boolean values.  The proof order is essential:
+the corresponding cancellation is not a formal polynomial identity.
+
+At the class level we obtain
+\[
+  \Ncl(\VPe(\F))=\VNPtwo(\F)
+  \qquad
+  (\charac(\F)=2,\ \F\neq\F_2).
+\]
+Combined with Valiant's \(\VNPe=\VNP\), the results of
+Bringmann--Ikenmeyer--Zuiddam, and their separation over \(\F_2\), this yields the complete
+field classification
+\[
+  \VNPwplus(\F)=\VNP(\F) \iff |\F|>2,
+  \qquad
+  \VNPone(\F)=\VNP(\F) \iff \F\not\cong\F_2.
+\]
+The finite compiler, its class lift, its width-one literature bridge, and the relevant
+scope firewalls have been formalized in \lean\ 4.
+\end{abstract}
+
+\tableofcontents
+
+
+\input{part1}
+\input{part2}
+\input{part3}
+\input{part4}
+\end{document}
