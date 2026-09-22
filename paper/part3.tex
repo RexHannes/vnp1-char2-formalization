@@ -1,0 +1,268 @@
+\section{Sharp quantitative bounds}\label{sec:counts}
+
+The generic bounds \(P\le 4|E|\) and \(D\le |V|\) already imply
+\(q\le26s\) and \(M\le70s\).  A sharper pair-count identity improves both constants.
+
+\begin{lemma}[Exact ordered-pair count]\label{lem:pairs}
+For the formula DAG \(G_\Phi\),
+\[
+  P=4a.
+\]
+\end{lemma}
+
+\begin{proof}
+Induct on the formula.  A leaf creates no pair.  A multiplication gate takes disjoint
+unions and adds a connector from a sink of outdegree zero to a source of indegree zero, so
+it creates no new common-head or common-tail pair.  An addition gate creates two edges
+with the fresh source as common tail, giving the two ordered pairs \((e_1,e_2)\) and
+\((e_2,e_1)\), and two edges with the fresh sink as common head, giving two more ordered
+pairs.  Thus every addition gate contributes exactly four.
+\end{proof}
+
+\begin{proof}[Proof of \cref{thm:finite-main}]
+Apply \cref{thm:graph-compiler} to \(G_\Phi\).  By
+\cref{lem:graph-counts,lem:pairs} and \(D\le|V|\),
+\begin{align*}
+ q
+ &=2|E|+D+P\\
+ &\le 2(l+4a+u)+(2l+2a)+4a\\
+ &=4l+14a+2u\\
+ &\le14(l+a+u)=14s.
+\end{align*}
+Similarly,
+\begin{align*}
+ M
+ &=|V|+4D+3(|E|+P)\\
+ &\le5|V|+3|E|+3P\\
+ &=5(2l+2a)+3(l+4a+u)+12a\\
+ &=13l+34a+3u\\
+ &\le34(l+a+u)=34s.
+\end{align*}
+Value preservation and the support bound are supplied by
+\cref{lem:dag-properties,thm:graph-compiler}.
+\end{proof}
+
+\section{The class-level lift}\label{sec:class}
+
+We now prove \cref{thm:class-main}.  It is useful to keep the outer nondeterministic cube
+and the compiler cube conceptually separate.
+
+\subsection{Forward containment}
+
+\begin{proposition}\label{prop:forward}
+If \(\charac(\F)=2\) and \(\tau\in\F\setminus\{0,1\}\), then
+\[
+  \Ncl(\VPe(\F))\subseteq\VNPtwo(\F).
+\]
+\end{proposition}
+
+\begin{proof}
+Let \(f\in\Ncl(\VPe)\).  By \cref{def:nclosure}, there exist
+\(g\in\VPe\) and polynomially bounded \(p,r\) such that
+\[
+ f_n(\mathbf{x})
+ =\sum_{\mathbf{b}\in\B^{p(n)}}
+   g_{r(n)}(\mathbf{x},\mathbf{b}).
+\]
+Choose formulas \(\Phi_m\) for \(g_m\) of size bounded by a polynomial \(s(m)\).  Apply
+\cref{thm:finite-main} to \(\Phi_{r(n)}\), treating both \(\mathbf{x}\) and
+\(\mathbf{b}\) as ordinary input variables.  We obtain a fresh cube
+\(\mathbf{c}\in\B^{q_n}\), with \(q_n\le14s(r(n))\), and support-two factors
+\(L_{n,j}(\mathbf{x},\mathbf{b},\mathbf{c})\), with
+\(M_n\le34s(r(n))\), such that
+\[
+ g_{r(n)}(\mathbf{x},\mathbf{b})
+ =\sum_{\mathbf{c}\in\B^{q_n}}
+   \prod_{j=1}^{M_n}L_{n,j}(\mathbf{x},\mathbf{b},\mathbf{c}).
+\]
+Substitution and finite-sum flattening give
+\[
+ f_n(\mathbf{x})
+ =\sum_{(\mathbf{b},\mathbf{c})\in\B^{p(n)}\times\B^{q_n}}
+   \prod_{j=1}^{M_n}L_{n,j}(\mathbf{x},\mathbf{b},\mathbf{c}).
+\]
+The disjoint union of the two cubes has dimension \(p(n)+q_n\), which is polynomially
+bounded.  Reindexing variables preserves the support-two property.  The number of factors
+is polynomially bounded.  Hence \(f\in\VNPtwo\).
+\end{proof}
+
+The machine-checked class theorem uses the certified coarse bounds \(26s\) and \(70s\)
+inside its polynomial-bound witnesses; the separately certified sharp theorem
+\(14s,34s\) yields the same mathematical containment.
+
+\subsection{Reverse containment}
+
+\begin{proposition}\label{prop:reverse}
+Over every field,
+\[
+  \VNPtwo(\F)\subseteq\Ncl(\VPe(\F)).
+\]
+\end{proposition}
+
+\begin{proof}
+Let
+\[
+ f_n(\mathbf{x})=
+ \sum_{\mathbf{b}\in\B^{q(n)}}\prod_{j=1}^{M(n)}L_{n,j}(\mathbf{x},\mathbf{b})
+\]
+be a support-two representation with polynomially bounded \(q,M\).  For fixed \(n\), the
+inner product has a formula of size \(O(M(n))\): each affine factor involving at most two
+variables has constant formula size, and the factors can be multiplied by a binary tree or
+a right-associated product.  The number of variables and total degree are polynomially
+bounded, the latter by \(M(n)\).  These inner products therefore form a family in
+\(\VPe\), and the displayed Boolean sum witnesses membership in \(\Ncl(\VPe)\).
+\end{proof}
+
+\begin{proof}[Proof of \cref{thm:class-main}]
+A characteristic-two field different from \(\F_2\) contains an element
+\(\tau\notin\{0,1\}\).  Apply \cref{prop:forward,prop:reverse}.
+\end{proof}
+
+\section{Width-one ABPs and the field classification}\label{sec:classification}
+
+\subsection{The literature bridge}
+
+A product \(L_1\cdots L_M\) is computed by a width-one ABP consisting of a path with
+successive edge labels \(L_1,\ldots,L_M\).  If each \(L_j\) has support at most two, this
+is a \(\mathrm{w}+\) width-one ABP in the notation of
+\cite{BringmannIkenmeyerZuiddam2018}.  Consequently,
+\[
+ \VNPtwo\subseteq\VNPwplus\subseteq\VNPone.
+\]
+The artifact formalizes the first inclusion through a literature-shaped internal class in
+which each factor has total degree at most one.  It deliberately does not identify the
+project's unrestricted internal affine-list class definitionally with the published class.
+
+For the opposite upper bound, \(\VPone\subseteq\VPe\): a polynomial-size product of affine
+forms is a polynomial-size formula.  Monotonicity of nondeterministic closure gives
+\[
+ \VNPone=\Ncl(\VPone)
+ \subseteq\Ncl(\VPe)=\VNPe.
+\]
+Valiant's characterization \(\VNPe=\VNP\) then yields
+\[
+ \VNPwplus\subseteq\VNPone\subseteq\VNP.
+\]
+
+\begin{theorem}[Characteristic-two width-one equality]\label{thm:char2-width1}
+If \(\charac(\F)=2\) and \(\F\neq\F_2\), then
+\[
+ \VNPwplus(\F)=\VNPone(\F)=\VNP(\F).
+\]
+\end{theorem}
+
+\begin{proof}
+By \cref{thm:class-main} and Valiant's theorem,
+\[
+ \VNP(\F)=\Ncl(\VPe(\F))=\VNPtwo(\F).
+\]
+The bridge and upper bounds above give
+\[
+ \VNP
+ =\VNPtwo
+ \subseteq\VNPwplus
+ \subseteq\VNPone
+ \subseteq\VNP.
+\]
+All containments are therefore equalities.
+\end{proof}
+
+\begin{proof}[Proof of \cref{cor:classification}]
+If \(|\F|>2\), either \(\charac(\F)\neq2\), in which case the support-two theorem of
+Bringmann--Ikenmeyer--Zuiddam applies, or \(\charac(\F)=2\) and \(\F\neq\F_2\), in which
+case apply \cref{thm:char2-width1}.  If \(|\F|=2\), then \(\F\cong\F_2\), and
+Bringmann--Ikenmeyer--Zuiddam proved the strict inclusion
+\(\VNPone(\F_2)\subsetneq\VNP(\F_2)\).  This rules out equality even with unrestricted
+affine labels and hence also in the support-two subclass.
+\end{proof}
+
+\begin{remark}[What the theorem does not require]
+No \(\F_4\) subfield is needed.  The only field-theoretic input is the existence of
+\(\tau\notin\{0,1\}\), equivalently \(|\F|>2\) for a field.  This includes all infinite
+fields of characteristic two and all finite fields \(\F_{2^m}\) with \(m\ge2\).
+\end{remark}
+
+\section{Formal verification}\label{sec:formal}
+
+The proof was formalized in \lean\ 4 \cite{Lean4} on top of Mathlib
+\cite{Mathlib2020}.  The support-two layer is append-only relative to the earlier
+support-three development.  Its principal source modules are summarized in
+\cref{tab:lean-map}.
+
+\begin{longtable}{@{}p{0.29\textwidth}p{0.65\textwidth}@{}}
+\caption{Correspondence between the mathematical proof and the formal artifact.}
+\label{tab:lean-map}\\
+\toprule
+\textbf{Module / theorem} & \textbf{Mathematical role}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Module / theorem} & \textbf{Mathematical role}\\
+\midrule
+\endhead
+\code{TernaryIdentity.lean} &
+Denominator-free and normalized versions of \cref{lem:quadratic,lem:ternary};
+\code{kappa_ne_zero}; Boolean error killer; formal non-vanishing firewall.\\[2mm]
+\code{SupportTwoGadget.lean} &
+Explicit three-factor quadratic and four-factor ternary affine lists; product evaluation;
+support bounds.\\[2mm]
+\code{CompilerTwo.lean} &
+Disjoint auxiliary types, finite-cube flattening, raw value with errors visible, and a
+conditional theorem eliminating errors only under a pointwise hypothesis.\\[2mm]
+\code{GraphCompilerTwo.lean} &
+Degree-three pigeonhole choice, same-head/same-tail error cancellation, graph value theorem,
+support bound, and exact counts \(q=2|E|+D+P\),
+\(M=|V|+4D+3(|E|+P)\).\\[2mm]
+\code{MainCompilerTwo.lean} &
+Formula-level value and support theorems; coarse bounds \(q\le26s\), \(M\le70s\).\\[2mm]
+\code{SharpConstants.lean} &
+Machine-checked identity \(P=4a\); sharp bounds \(q\le14s\), \(M\le34s\).\\[2mm]
+\code{ClassLevelTwo.lean} &
+Definition of the internal support-two class; forward and reverse containments; equality
+\(\Ncl(\VPe)=\VNPtwo\); finite-field and existential-\(\tau\) forms; width-one literature
+bridge.\\[2mm]
+\code{GadgetMinimality.lean} &
+Achievement of one auxiliary and three factors, plus a limited zero-auxiliary degree lower
+bound.  No full minimality theorem is claimed.\\[2mm]
+\code{RegressionTestsTwo.lean} &
+Positive examples and negative firewall tests, including failure at \(\tau=0,1\), failure
+of auxiliary reuse, and the genuine support-three degree of an uncompiled ternary flow
+factor.\\[2mm]
+\code{AxiomAuditTwo.lean} &
+\code{#print axioms} audit on the principal new theorems.\\
+\bottomrule
+\end{longtable}
+
+\subsection{Reported build and trust boundary}
+
+The supplied artifact report records:
+\begin{itemize}[leftmargin=1.6em]
+\item a successful \code{lake build} under \lean\ \code{v4.28.0} and Mathlib
+\code{v4.28.0}, comprising 8064 jobs with no errors;
+\item no declarations using \code{sorry}, \code{admit}, a new \code{axiom},
+\code{unsafe}, \code{opaque}, \code{native_decide}, or \code{@[implemented_by]};
+\item \code{#print axioms} output for 52 principal support-two theorems containing only
+\code{propext}, \code{Classical.choice}, and \code{Quot.sound}.
+\end{itemize}
+The manuscript-production environment was able to inspect the archive statically but did
+not contain a Lake installation, so it did not independently rerun the recorded build.
+This distinction should be preserved in any public artifact statement until a separate
+reproduction is completed.
+
+No published theorem is assumed as a \lean\ axiom.  The machine-checked endpoint is the
+internal equality \(\Ncl(\VPe)=\VNPtwo\) and its internal width-one bridge.  Valiant's
+\(\VNPe=\VNP\), the characteristic-not-two theorem, and the \(\F_2\) separation are
+imported only in the paper-level corollary.
+
+\subsection{Artifact availability}
+
+At the date of this draft, the public repository is
+\begin{center}
+\url{https://github.com/RexHannes/vnp1-char2-formalization}.
+\end{center}
+The support-two archive used for this manuscript has SHA-256 digest
+\[
+\code{6f6ccac3d858b1eb71493b69d7708fa8488a220cbd1039c2ee07354df2d4c139}.
+\]
+The public default branch should be checked against this digest or an identified support-two
+commit before the paper is circulated as artifact-complete.

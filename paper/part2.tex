@@ -1,0 +1,278 @@
+\section{From formulas to bounded-degree labelled DAGs}\label{sec:formula-dag}
+
+We recall a standard syntax-directed conversion.  Its precise form is useful because the
+support and counting arguments depend on local degrees.
+
+\begin{construction}[Formula DAG]\label{cons:dag}
+Associate to each formula \(\Phi\) a labelled ranked DAG \(G_\Phi\) as follows.
+\begin{enumerate}[label=(\roman*)]
+\item A leaf \(\ell\) becomes one edge from a fresh source to a fresh sink, labelled
+\(\ell\).
+\item If \(\Phi=\Psi\Theta\), take the disjoint union of \(G_\Psi\) and \(G_\Theta\) and
+add one unit-labelled edge from the sink of \(G_\Psi\) to the source of \(G_\Theta\).
+\item If \(\Phi=\Psi+\Theta\), take the disjoint union, add a fresh source with one
+unit-labelled edge to each child source, and add one unit-labelled edge from each child
+sink to a fresh sink.
+\end{enumerate}
+Ranks are chosen compatibly so every edge increases rank.
+\end{construction}
+
+\begin{lemma}[Value and local degree]\label{lem:dag-properties}
+The path polynomial of \(G_\Phi\) equals \(\Phi\).  Every edge label is a variable or a
+constant.  The source has indegree zero and outdegree at most two; the sink has outdegree
+zero and indegree at most two; every internal vertex has total degree at most three.
+\end{lemma}
+
+\begin{proof}
+The value statement follows by structural induction.  A leaf has its label as its unique
+path value.  The multiplication construction concatenates a path in the left graph with
+the unit connector and a path in the right graph, multiplying their values.  The addition
+construction offers a disjoint choice between the two child graphs, adding their path
+sums.  The degree assertions follow simultaneously from the three constructors.  In the
+multiplication constructor, the old left sink gains one outgoing connector and the old
+right source gains one incoming connector; each had the opposite boundary degree zero.
+In the addition constructor, the new boundary vertices have degree two, while each child
+boundary gains one incident connector.  Thus no internal total degree exceeds three.
+\end{proof}
+
+Let \(l,a,u\) be the leaf, addition-gate, and multiplication-gate counts of \(\Phi\).
+
+\begin{lemma}[Graph counts]\label{lem:graph-counts}
+For \(G_\Phi=(V,E)\),
+\[
+  |E|=l+4a+u,
+  \qquad
+  |V|=2l+2a.
+\]
+\end{lemma}
+
+\begin{proof}
+Induct on the formula.  A leaf contributes two vertices and one edge.  A multiplication
+adds the counts of the children and one connector edge.  An addition adds the child counts,
+two new vertices, and four connector edges.
+\end{proof}
+
+\section{The Boolean path selector}\label{sec:selector}
+
+Fix a ranked DAG \(G=(V,E)\) satisfying the degree conditions of
+\cref{lem:dag-properties}.  Introduce a Boolean variable \(z_e\) for each edge.  For a
+vertex \(v\), set
+\[
+ I_v(z)=\sum_{e:\,\mathrm{tgt}(e)=v}z_e,
+ \qquad
+ O_v(z)=\sum_{e:\,\mathrm{src}(e)=v}z_e.
+\]
+Define the flow factor
+\[
+ F_v(z)=
+ \begin{cases}
+   O_s(z),&v=s,\\
+   I_t(z),&v=t,\\
+   1+I_v(z)+O_v(z),&v\notin\{s,t\}.
+ \end{cases}
+\]
+For every ordered pair of distinct edges with a common head, and every ordered pair of
+distinct edges with a common tail, include a pair-exclusion factor \(1+z_ez_{e'}\).  Let
+\(\mathcal P\) be the resulting ordered-pair index set, and put
+\[
+ \Sel_G(z)=
+ \left(\prod_{v\in V}F_v(z)\right)
+ \left(\prod_{(e,e')\in\mathcal P}(1+z_ez_{e'})\right).
+\]
+The use of ordered pairs duplicates each unordered exclusion.  This does not change its
+Boolean value, which is zero or one.
+
+\begin{proposition}[Selector correctness]\label{prop:selector}
+For every \(z\in\B^E\),
+\[
+ \Sel_G(z)=
+ \begin{cases}
+  1,&\{e:z_e=1\}\text{ is the edge set of a directed }s\text{--}t\text{ path},\\
+  0,&\text{otherwise}.
+ \end{cases}
+\]
+\end{proposition}
+
+\begin{proof}
+Every factor evaluates to zero or one.  The pair exclusions force at most one selected
+incoming edge and at most one selected outgoing edge at each vertex.  Subject to those
+exclusions, the source flow factor is one precisely when the source has one selected
+outgoing edge, and the sink factor is one precisely when the sink has one selected incoming
+edge.  At an internal vertex, \(I_v,O_v\in\{0,1\}\), and
+\(1+I_v+O_v=1\) precisely when \(I_v=O_v\).  Hence every selected internal vertex has one
+selected incoming edge if and only if it has one selected outgoing edge.
+
+Starting at the unique selected edge out of \(s\), conservation and finiteness extend it
+forward until it reaches \(t\).  It cannot stop at an internal vertex.  It cannot revisit a
+vertex because the graph is ranked and acyclic.  Thus it gives an \(s\)-\(t\) path.  Any
+additional selected component would be finite, avoid \(s,t\), and have equal selected
+indegree and outdegree at every one of its vertices.  Following its unique outgoing edges
+would create a directed cycle, contradicting acyclicity.  Therefore no additional component
+exists.  The converse is immediate: an \(s\)-\(t\) path satisfies all flow and exclusion
+factors.
+\end{proof}
+
+Let \(\ell_e\) be the affine label of edge \(e\), and define its conditional label factor
+\[
+  C_e(z_e)=1+z_e(\ell_e+1).
+\]
+In characteristic two,
+\[
+  C_e(0)=1,
+  \qquad
+  C_e(1)=\ell_e.
+\]
+
+\begin{proposition}[ABP hypercube identity]\label{prop:abp-cube}
+For a labelled DAG over a field of characteristic two,
+\[
+  \val(G)=
+  \sum_{z\in\B^E}\Sel_G(z)\prod_{e\in E}C_e(z_e).
+\]
+\end{proposition}
+
+\begin{proof}
+By \cref{prop:selector}, only selector assignments that are edge sets of source--sink paths
+survive.  For such an assignment, the conditional label product equals the product of the
+labels on the selected path; all unselected edges contribute one.  Summing the surviving
+terms is exactly the path polynomial.
+\end{proof}
+
+\section{The support-two compiler}\label{sec:compiler}
+
+The expression in \cref{prop:abp-cube} is not yet a product of support-two affine forms.
+It contains quadratic factors \(1+xy\) and, at total-degree-three internal vertices,
+ternary affine flow factors.  We now compile both kinds with fresh one-bit gadgets.
+
+\subsection{Occurrence sets and fresh auxiliaries}
+
+Let
+\[
+  D=\#\{v\in V\setminus\{s,t\}:\indeg(v)+\outdeg(v)=3\}
+\]
+and let \(P=|\mathcal P|\) be the ordered pair count.  There are exactly
+\(|E|+P\) quadratic occurrences: one conditional edge factor per edge and one exclusion
+per ordered pair.  Give every such occurrence its own fresh bit.  Give every degree-three
+internal flow factor its own fresh bit.  The full auxiliary set is the disjoint union of
+\[
+  \underbrace{E}_{\text{original selectors}}
+  \ \sqcup\ 
+  \underbrace{T}_{\text{ternary gadgets}}
+  \ \sqcup\ 
+  \underbrace{K}_{\text{quadratic gadgets}},
+\]
+where \(|T|=D\) and \(|K|=|E|+P\).
+
+Freshness is structural.  It prevents the generally false replacement
+\[
+  \left(\sum_h A_h\right)\left(\sum_k B_k\right)
+  \stackrel{\text{false}}{=}
+  \sum_h A_hB_h.
+\]
+With disjoint bits, finite distributivity gives a sum over the Cartesian product of the
+local cubes.
+
+\subsection{Compiling quadratic occurrences}
+
+Every pair exclusion is \(1+z_ez_{e'}\).  Every conditional edge factor can be written
+\[
+  1+z_e(\ell_e+1).
+\]
+In a formula-generated DAG, \(\ell_e\) is a variable or constant.  Therefore each of the
+two arguments of the quadratic gadget in \cref{lem:quadratic} has support at most one.
+Replacing each quadratic occurrence by its own copy of the gadget yields three affine
+factors of support at most two.
+
+\subsection{Compiling ternary flow factors}
+
+At a degree-three internal vertex, the flow factor is
+\[
+  1+z_a+z_b+z_c
+\]
+for its three incident edges.  Replace it by the four factors from
+\cref{lem:ternary}.  After summing the fresh ternary bit, the resulting local value is
+\[
+  1+z_a+z_b+z_c+\kappa^{-1}z_az_bz_c.
+\]
+The last summand is the error term.
+
+Among three incident edges and two sides of a vertex, two edges lie on the same side.
+Choose \(a,b\) so that they share a head or share a tail.  The original selector contains
+the corresponding exclusion \(1+z_az_b\).
+
+\begin{lemma}[Pointwise ternary cancellation]\label{lem:local-cancel}
+Fix an original selector assignment \(z\in\B^E\).  Let \(e_v(z)=\kappa^{-1}z_az_bz_c\) be
+the error at a ternary vertex \(v\), and let \(W(z)\) be the product of all recovered
+quadratic factors.  Then
+\[
+  e_v(z)W(z)=0.
+\]
+\end{lemma}
+
+\begin{proof}
+The product \(W(z)\) contains \(1+z_az_b\).  Hence the claim follows from
+\cref{lem:killer} after multiplying by the remaining factors.
+\end{proof}
+
+The following elementary product lemma lets us remove all errors simultaneously.
+
+\begin{lemma}[Product error elimination]\label{lem:prod-errors}
+Let \(R\) be a commutative ring, let \(p_j,e_j,W\in R\), and suppose
+\(e_jW=0\) for every \(j\) in a finite index set.  Then
+\[
+  \left(\prod_j(p_j+e_j)\right)W
+  =\left(\prod_jp_j\right)W.
+\]
+\end{lemma}
+
+\begin{proof}
+Induct on the index set.  In the induction step,
+\[
+ (p+e)XW=pXW+eXW=pXW,
+\]
+because commutativity gives \(eXW=X(eW)=0\).
+\end{proof}
+
+\begin{theorem}[Graph compiler]\label{thm:graph-compiler}
+Let \(G\) satisfy the degree and label conditions of \cref{lem:dag-properties}.  Over a
+characteristic-two field containing \(\tau\notin\{0,1\}\), the path polynomial of \(G\)
+has a support-two affine-hypercube representation with
+\[
+ q=2|E|+D+P,
+ \qquad
+ M=|V|+4D+3(|E|+P).
+\]
+\end{theorem}
+
+\begin{proof}
+Fix the original selector assignment \(z\).  Sum first over all fresh quadratic and
+ternary gadget bits.  Because every occurrence has a distinct fresh auxiliary, repeated
+finite distributivity factors these local sums.  By \cref{lem:quadratic}, the quadratic
+sums recover every conditional edge factor and pair exclusion.  By
+\cref{lem:ternary}, each ternary sum recovers the corresponding flow factor plus its cubic
+error.  Apply \cref{lem:local-cancel,lem:prod-errors} while \(z\) is fixed.  The resulting
+expression is precisely
+\[
+  \Sel_G(z)\prod_{e\in E}C_e(z_e).
+\]
+Now sum over \(z\) and invoke \cref{prop:abp-cube}.
+
+For support, the source and sink flow factors use at most two selectors.  A non-ternary
+internal flow factor uses at most two selectors, and a ternary vertex contributes a
+constant placeholder together with four support-two gadget factors.  Every quadratic
+gadget factor has support at most two.  The auxiliary count is
+\[
+ |E|+D+(|E|+P)=2|E|+D+P.
+\]
+The implemented factor list contains one flow placeholder for every vertex, four factors
+per ternary occurrence, and three factors per quadratic occurrence, giving
+\[
+ |V|+4D+3(|E|+P).
+\]
+\end{proof}
+
+\begin{remark}
+The constant placeholder at a ternary vertex is retained in the formal representation.
+Dropping such unit factors could improve numerical constants, but is irrelevant to the
+class theorem and is not used in the certified accounting.
+\end{remark}

@@ -1,0 +1,210 @@
+\section{Related work}\label{sec:related}
+
+Valiant introduced the algebraic complexity framework and \(\VNP\)
+\cite{Valiant1979,Valiant1980}.  Ben-Or and Cleve showed that polynomial-size formulas and
+width-three ABPs are polynomially equivalent \cite{BenOrCleve1992}.  Allender and Wang
+proved explicit limitations of exact width-two ABPs \cite{AllenderWang2016}.
+
+Bringmann, Ikenmeyer and Zuiddam studied small-width ABPs, border complexity, and
+nondeterministic closures in a unified framework
+\cite{BringmannIkenmeyerZuiddam2018,BringmannIkenmeyerZuiddam2017}.  Their Theorem~4.2
+identifies \(\VNPone\) with \(\VNP\) when the characteristic is not two; their support-two
+refinement appears as Theorem~6.3 in the extended version.  Their Proposition~9.1 proves
+strictness over \(\F_2\), while their discussion explicitly leaves all other
+characteristic-two fields open.  They also note an \(\F_4\) representation of \(1+xy\),
+which shows that the \(\F_2\) obstruction does not automatically extend to larger
+characteristic-two fields.  The present \(\tau\)-gadget works uniformly without requiring
+an \(\F_4\) subfield.
+
+Dutta et al. proved universality results for \emph{border} width-two ABPs in
+characteristic two and showed that a suitable power of a polynomial with a small formula
+has a small border-width-two representation \cite{DuttaEtAl2024}.  That work concerns
+approximate deterministic width two.  The present theorem concerns exact nondeterministic
+width one; neither result subsumes the other.
+
+\section{Limitations and open directions}\label{sec:open}
+
+\paragraph{Constants.}
+The certified list keeps a unit placeholder for every ternary vertex and uses ordered pair
+exclusions.  Removing redundant unit factors or using a different selector may improve
+\(14\) and \(34\).  Such improvements would not change the class theorem.
+
+\paragraph{Local minimality.}
+The artifact proves that the characteristic-two gadget achieves one auxiliary bit and three
+factors, and certifies a limited degree lower bound in the zero-auxiliary setting.  It does
+not formalize the full impossibility of a two-factor positive-auxiliary gadget.  No
+optimality claim is part of the main theorem.
+
+\paragraph{The exceptional field.}
+Over \(\F_2\), unrestricted nondeterministic width one is strictly weaker than \(\VNP\).
+The internal structure of support-bounded subclasses over \(\F_2\) remains a separate
+question.
+
+\paragraph{Alternative direct compilers.}
+The graph selector gives a modular and machine-checked proof.  A direct activation-state
+compiler on the formula tree might reduce constants and shorten the semantic argument, but
+such a route should be treated as a new proof until separately formalized and audited.
+
+\paragraph{Border complexity.}
+The exact hypercube identities do not provide a deterministic width-two matrix product,
+control an approximation parameter, or extract Frobenius roots.  Extending them to the
+border-width-two setting would require an additional theorem, not a reinterpretation of
+the present proof.
+
+\section{Conclusion}
+
+Over every characteristic-two field other than \(\F_2\), a binary arithmetic formula can
+be compiled into a Boolean hypercube sum of a product of affine forms, each supported on at
+most two variables, with linear overhead.  The construction works because a uniform
+quadratic gadget and a ternary gadget can be integrated with a path selector whose local
+exclusions annihilate the ternary error pointwise.  The resulting class equality fills the
+characteristic-two range left open in the width-one nondeterministic programme and, together
+with prior work, makes \(\F_2\) the unique exceptional field.
+
+\appendix
+
+\section{A more explicit selector proof}\label{app:selector}
+
+For completeness, we isolate the combinatorial fact used in \cref{prop:selector}.  Let
+\(H\) be the selected-edge subgraph.  Pair exclusions imply
+\(\indeg_H(v),\outdeg_H(v)\in\{0,1\}\).  A nonzero source factor gives
+\(\outdeg_H(s)=1\), and a nonzero sink factor gives \(\indeg_H(t)=1\).  At every other
+vertex, the flow factor is nonzero if and only if
+\(\indeg_H(v)=\outdeg_H(v)\).
+
+Follow the unique selected outgoing edge from \(s\).  At any internal vertex reached, the
+selected incoming edge forces a selected outgoing edge.  Because rank strictly increases,
+the walk cannot repeat a vertex and must terminate.  It cannot terminate internally and
+therefore terminates at \(t\).  Now suppose another selected edge exists.  Its component
+contains neither \(s\) nor \(t\), since each of those already has its unique selected
+incident edge in the constructed path.  Every vertex in the extra component has equal
+selected indegree and outdegree.  Starting from any selected edge and repeatedly following
+selected outgoing edges produces a directed cycle in the finite component, contradicting
+strict rank increase.  Hence the selected subgraph is exactly one source--sink path.
+
+\section{The exact compiler ledger}\label{app:ledger}
+
+Let \(E,V,P,D\) be as in \cref{sec:compiler}.  The formal compiler uses the following
+objects.
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Object & Count & Contribution\\
+\midrule
+Original edge selectors & \(|E|\) & auxiliary bits\\
+Quadratic occurrences & \(|E|+P\) & one bit, three factors each\\
+Ternary occurrences & \(D\) & one bit, four factors each\\
+Flow placeholders & \(|V|\) & one factor each\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Therefore
+\[
+ q=|E|+(|E|+P)+D=2|E|+P+D,
+\]
+and
+\[
+ M=|V|+3(|E|+P)+4D.
+\]
+For formula graphs, substituting
+\[
+ |E|=l+4a+u,\quad |V|=2l+2a,\quad P=4a,\quad D\le|V|
+\]
+gives the sharp certified inequalities in \cref{sec:counts}.  The unproved proposed
+identity \(D+B=2a\) is not used: the number of degree-three vertices depends on formula
+shape beyond the triple \((l,a,u)\).
+
+\section{Machine-checked scope firewalls}\label{app:firewalls}
+
+The formal development includes negative or limiting statements designed to prevent the
+main theorem from being overread.
+
+\begin{enumerate}[leftmargin=1.8em]
+\item \(abc(1+ab)\) is not the zero formal polynomial.
+\item The ternary gadget without a pair exclusion retains a nonzero error.
+\item \(\tau=0\) and \(\tau=1\) make \(\kappa=0\), so the normalized gadgets are illegal.
+\item Sharing one fresh bit between distinct gadget occurrences changes the represented
+polynomial in general.
+\item A graph edge carrying an unrestricted three-variable affine label can violate the
+support-two target; the theorem is stated for formula-generated graphs with one-variable
+or constant labels.
+\item A degree-three flow factor genuinely has support three before ternary compilation.
+\item The class theorem is a representation theorem and includes no evaluator or runtime
+claim.
+\end{enumerate}
+
+\begin{thebibliography}{BIZ18}
+
+\bibitem[BIZ18]{BringmannIkenmeyerZuiddam2018}
+K.~Bringmann, C.~Ikenmeyer, and J.~Zuiddam.
+\newblock On algebraic branching programs of small width.
+\newblock \emph{Journal of the ACM}, 65(5):32:1--32:29, 2018.
+\newblock \href{https://doi.org/10.1145/3209663}{doi:10.1145/3209663}.
+
+\bibitem[BIZ17]{BringmannIkenmeyerZuiddam2017}
+K.~Bringmann, C.~Ikenmeyer, and J.~Zuiddam.
+\newblock On algebraic branching programs of small width.
+\newblock In \emph{32nd Computational Complexity Conference (CCC 2017)},
+  volume 79 of \emph{LIPIcs}, pages 20:1--20:31, 2017.
+\newblock \href{https://doi.org/10.4230/LIPIcs.CCC.2017.20}{doi:10.4230/LIPIcs.CCC.2017.20}.
+
+\bibitem[Val79]{Valiant1979}
+L.~G. Valiant.
+\newblock Completeness classes in algebra.
+\newblock In \emph{Proceedings of the Eleventh Annual ACM Symposium on Theory of Computing},
+  pages 249--261, 1979.
+\newblock \href{https://doi.org/10.1145/800135.804419}{doi:10.1145/800135.804419}.
+
+\bibitem[Val80]{Valiant1980}
+L.~G. Valiant.
+\newblock Reducibility by algebraic projections.
+\newblock Internal report, Department of Computer Science, University of Edinburgh, 1980.
+
+\bibitem[BC92]{BenOrCleve1992}
+M.~Ben-Or and R.~Cleve.
+\newblock Computing algebraic formulas using a constant number of registers.
+\newblock \emph{SIAM Journal on Computing}, 21(1):54--58, 1992.
+\newblock \href{https://doi.org/10.1137/0221006}{doi:10.1137/0221006}.
+
+\bibitem[AW16]{AllenderWang2016}
+E.~Allender and F.~Wang.
+\newblock On the power of algebraic branching programs of width two.
+\newblock \emph{Computational Complexity}, 25(1):217--253, 2016.
+\newblock \href{https://doi.org/10.1007/s00037-015-0114-7}{doi:10.1007/s00037-015-0114-7}.
+
+\bibitem[DIK${}^{+}$24]{DuttaEtAl2024}
+P.~Dutta, C.~Ikenmeyer, B.~Komarath, H.~Mittal, S.~G. Nanoti, and D.~Thakkar.
+\newblock On the power of border width-2 {ABP}s over fields of characteristic 2.
+\newblock In \emph{41st International Symposium on Theoretical Aspects of Computer Science
+  (STACS 2024)}, volume 289 of \emph{LIPIcs}, pages 31:1--31:16, 2024.
+\newblock \href{https://doi.org/10.4230/LIPIcs.STACS.2024.31}{doi:10.4230/LIPIcs.STACS.2024.31}.
+
+\bibitem[Bür00]{Burgisser2000}
+P.~Bürgisser.
+\newblock \emph{Completeness and Reduction in Algebraic Complexity Theory}.
+\newblock Algorithms and Computation in Mathematics, vol.~7. Springer, 2000.
+\newblock \href{https://doi.org/10.1007/978-3-662-04179-6}{doi:10.1007/978-3-662-04179-6}.
+
+\bibitem[MP08]{MalodPortier2008}
+G.~Malod and N.~Portier.
+\newblock Characterizing Valiant's algebraic complexity classes.
+\newblock \emph{Journal of Complexity}, 24(1):16--38, 2008.
+\newblock \href{https://doi.org/10.1016/j.jco.2006.09.006}{doi:10.1016/j.jco.2006.09.006}.
+
+\bibitem[dMU21]{Lean4}
+L.~de Moura and S.~Ullrich.
+\newblock The {Lean 4} theorem prover and programming language.
+\newblock In \emph{Automated Deduction---CADE 28}, volume 12699 of \emph{LNCS},
+  pages 625--635. Springer, 2021.
+\newblock \href{https://doi.org/10.1007/978-3-030-79876-5_37}{doi:10.1007/978-3-030-79876-5\_37}.
+
+\bibitem[Com20]{Mathlib2020}
+The mathlib Community.
+\newblock The {Lean} mathematical library.
+\newblock In \emph{Proceedings of the 9th ACM SIGPLAN International Conference on
+  Certified Programs and Proofs}, pages 367--381, 2020.
+\newblock \href{https://doi.org/10.1145/3372885.3373824}{doi:10.1145/3372885.3373824}.
+
+\end{thebibliography}
